@@ -25,7 +25,6 @@ Param
 "uncpath : '$uncpath'"
 "account : '$account'"
 "sakey   : '$SaKey'"
-alPath z: -RemotePath $uncpath -UserName $account -Password $SaKey -Persistent $false 
 
 #
 # files and directories
@@ -40,17 +39,19 @@ $outfile =  (Join-Path $batchwd "Mersenne-$($index).txt")
 $generateMersenne = "$env:AZ_BATCH_APP_PACKAGE_MERSENNE\Mersenne\calculate_print_mersenne_primes.ps1"
 
 #
-# create share mapping. 
+# create data. This takes a while for large Mersenne numbers. 
 #
-throw "WK TODO: dynamic letter."
-
-Remove-SmbMapping -LocalPath z: -Force
-New-SmbMapping -Loc
-
-#
-# create data, upload
-#
+"starting to generate the Mersenne number"
 &$generateMersenne -index $index > $outfile
+
+#
+# upload. Z: may exist if you have concurrent tasks. 
+#
+"starting upload"
+If (-not (Get-SmbMapping -LocalPath Z:))
+{
+    New-SmbMapping -LocalPath z: -RemotePath $uncpath -UserName $account -Password $SaKey -Persistent $false 
+}
 Copy-Item $outfile z:
 
 #
@@ -61,4 +62,7 @@ get-childitem env: | Where-Object { $_.name -like "AZ_*" } | ForEach-Object {
     "`$env:$($_.name) = `"$($_.value)`""
 } > (Join-Path $batchwd "$($hostname)-AZ-env.txt")
 
-
+#
+# finish up
+#
+Remove-SmbMapping -LocalPath z: -Force -ErrorAction SilentlyContinue

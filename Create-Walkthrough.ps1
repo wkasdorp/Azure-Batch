@@ -1,4 +1,9 @@
-﻿# straight from: https://docs.microsoft.com/en-us/azure/batch/batch-powershell-cmdlets-get-started 
+﻿# This walkthrough was adapted from: https://docs.microsoft.com/en-us/azure/batch/batch-powershell-cmdlets-get-started 
+
+#
+# preliminary stuff: log on to azure, enable verbosity to see what is happening. Edit as you see fit. 
+#
+Add-AzureRmAccount
 $VerbosePreference="Continue"
 
 #
@@ -35,7 +40,7 @@ $ResourceGroup = Get-AzureRmResourceGroup -Name $ResourceGroupName -ErrorAction 
 if ($ResourceGroup -eq $null)
 {
     Write-Verbose "creating new resource group: $ResourceGroupName"
-    $ResourceGroup = New-AzureRmResourceGroup –Name $ResourceGroupName -Location $Region
+    $ResourceGroup = New-AzureRmResourceGroup –Name $ResourceGroupName -Location $Region -ErrorAction Stop
 }
 
 #
