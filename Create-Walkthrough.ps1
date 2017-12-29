@@ -7,20 +7,31 @@ Add-AzureRmAccount
 $VerbosePreference="Continue"
 
 #
-# define names.
+# define names and parameters
 #
 $ResourceGroupName = "rg-batch-walkthrough"
 $Region = "Central US"
 $BatchAccountNamePrefix = "walkthrough"
+$WindowsVersion = "2016"
 
 #
 # don't touch these unless you know what you are doing. 
+# It has a relation with the script used to create jobs and tasks
 #
 $Applicationname = "Mersenne"
 $PoolName = "Pool1"
 $ShareName ="mersenneshare"
 $Nodecount = 2
 $PackageURL = "https://github.com/wkasdorp/Azure-Batch/raw/master/ZIP/MersenneV1.zip"
+
+#
+# hash to translate OS version to a PSCloudServiceConfiguration number. Lowest supported version is currently 2012
+#
+$poolWindowsVersion = @{
+    "2012"     = 3
+    "2012R2"   = 4
+    "2016"     = 5
+}
 
 #
 # helper function to create a unique ID from a resource ID
@@ -66,22 +77,11 @@ if ($BatchAccount -eq $null)
     $Share = New-AzureStorageShare -Context $StorageAccount.Context -Name $ShareName
 
     #
-    # create the batch account, associated it with the storage account
+    # create the batch account, associate it with the storage account
     #
     Write-Verbose "Creating new batch account: $BatchAccountName"
     $BatchAccount = New-AzureRmBatchAccount –AccountName $BatchAccountName –Location $Region –ResourceGroupName $ResourceGroupName -AutoStorageAccountId $StorageAccount.Id
 }
-
-#
-# Read the storage account and the shared folder object. Get the key 
-# for later use by the Batch Application.
-#
-Write-Verbose "Reading Storage account, its key, and the share configuration" 
-$StorageAccount = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName 
-$StorageKey = ($StorageAccount | Get-AzureRmStorageAccountKey)[0].Value
-$Share = Get-AzureStorageShare -Name $ShareName -Context $StorageAccount.Context
-$uncPath = $Share.Uri -replace 'https://','\\' -replace '/','\'
-$shareAccount = "AZURE\$($StorageAccount.StorageAccountName)"
 
 #
 # Get the context of the batch account; this part contains the keys.
@@ -107,22 +107,13 @@ Write-Verbose "Setting default version for $applicationname to 1.0"
 Set-AzureRmBatchApplication -AccountName $BatchAccountName -ResourceGroupName $ResourceGroupName -ApplicationId $applicationname -DefaultVersion "1.0"
 
 #
-# create a pool of VMs with the application preinstalled. This will take a while to initialize, 15m is usual. 
+# create a pool of VMs with the application preinstalled. The nodes take a while to initialize, 15m is usual. 
 #
 $appPackageReference = New-Object Microsoft.Azure.Commands.Batch.Models.PSApplicationPackageReference
 $appPackageReference.ApplicationId = $applicationname
 $appPackageReference.Version = "1.0"
-
-Write-Verbose "Creating new pool named: $PoolName. It has $Nodecount Windows nodes."
-$PoolConfig = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSCloudServiceConfiguration" -ArgumentList @(4,"*")
+Write-Verbose "Creating new pool named: $PoolName. It has $Nodecount nodes, provisioned for Windows Server $WindowsVersion"
+$PoolConfig = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSCloudServiceConfiguration" -ArgumentList @($poolWindowsVersion[$WindowsVersion],"*")
 New-AzureBatchPool -Id $PoolName -VirtualMachineSize "Small" -CloudServiceConfiguration $PoolConfig `
     -BatchContext $BatchContext -ApplicationPackageReferences $appPackageReference -TargetDedicatedComputeNodes $Nodecount
 
-@"
-todo:
-- change mersenne runs cript to read UNC, SA name, en SA key
-- change mersenne to write to share
-- create JOb
-- create task with extra CMD args
-   
-"@

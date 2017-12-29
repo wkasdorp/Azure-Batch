@@ -95,7 +95,10 @@ $firstindex..$lastindex  | ForEach-Object {
 # wait for tasks to finish while supplying some output. 
 #
 Write-Verbose "Now waiting for tasks to complete"                  
-Write-Host "waiting for tasks to complete..." -ForegroundColor Cyan
+Write-Host "Waiting for tasks to complete..." -ForegroundColor Cyan
+Write-Host " Active    : waiting to be provisioned. This is expected when nodes are busy or not ready." -ForegroundColor Cyan
+Write-Host " Running   : job is active on a node." -ForegroundColor Cyan
+Write-Host " Completed : job has reported back as finished. Could be failed or succeeded." -ForegroundColor Cyan
 do {
     $stats = Get-AzureBatchTask -BatchContext $batchkeys -JobId $jobname -Verbose:$false | Group-Object -NoElement state
     $stats | Format-Table
@@ -107,5 +110,6 @@ do {
 # terminate the job and any remaining tasks. 
 #
 Write-Verbose "Terminating job $jobname"
-Stop-AzureBatchJob -id $jobname -BatchContext $batchkeys
+Stop-AzureBatchJob -id $jobname -BatchContext $batchkeys -Verbose:$false
 
+Write-Host "Retrieve output files from the Azure File Service at: $($share.Uri)" -ForegroundColor Yellow
