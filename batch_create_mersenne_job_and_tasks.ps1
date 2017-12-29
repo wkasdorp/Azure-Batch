@@ -4,17 +4,20 @@ $VerbosePreference="Continue"
 #
 # adjustable parameters for the job and tasks.
 #
+# The indexes refer to the N-th Mersenne Prime. Max is 48, which will take 2 days to calculate. 
+#
 $firstindex = 1
-$lastindex = 10 # current maximum index.
+$lastindex = 20 # current maximum index.
 $jobnamePrefix = "mersenne-job"
 $tasknameprefix = "task"
 
 #
-# define names. Be careful changing these.
+# define names. Be careful changing these, these refer to the script that generated the Batch Account.
 #
 $Applicationname = "Mersenne"
 $ResourceGroupName = "rg-batch-walkthrough"
 $BatchAccountNamePrefix = "walkthrough"
+$ShareName ="mersenneshare"
 
 #
 # helper function to create a unique ID from a resource ID
@@ -24,8 +27,6 @@ function Get-LowerCaseUniqueID ([string]$id, $length=8)
     $hashArray = (New-Object System.Security.Cryptography.SHA512Managed).ComputeHash($id.ToCharArray())
     -join ($hashArray[1..$length] | ForEach-Object { [char]($_ % 26 + [byte][char]'a') })
 }
-
-
 
 #
 # get the batch account. Note that its name derives from the Resource Group ID, which contains the unique subscription GUID. 
@@ -84,25 +85,10 @@ $appref.ApplicationId = $batchapp.id
 $appref.Version = $version
 $firstindex..$lastindex  | ForEach-Object {
     $ps1file =  "%AZ_BATCH_APP_PACKAGE_MERSENNE#$($version)%\generate_decimal_mersenne_and_upload.ps1"
-    # $taskCMD = "cmd /c `"powershell -executionpolicy bypass -File $ps1file -index $_`""
     $taskCMD = "cmd /c `"powershell -executionpolicy bypass -File $ps1file -index $_ -uncpath $uncPath -account $shareAccount -sakey $StorageKey`""
     $taskName = "$tasknameprefix-$_-$taskPostfix"
     Write-Verbose "- submitting task '$taskname' to job '$jobname'"
-    Write-Verbose "- DEBUG taskCMD: '$taskCMD'"
-  
---------curreent error
-C:\user\tasks\applications\wd\mersenne\1.0\2017-12-26T22.41.36.169Z\generate_de
-cimal_mersenne_and_upload.ps1 : Cannot process argument transformation on 
-parameter 'uncpath'. Cannot convert value 
-"\\sawalkthroughpkvydrcf.file.core.windows.net\mersenneshare" to type 
-"System.Int32". Error: "Input string was not in a correct format."
-    + CategoryInfo          : InvalidData: (:) [generate_decimal_mersenne_and_ 
-   upload.ps1], ParentContainsErrorRecordException
-    + FullyQualifiedErrorId : ParameterArgumentTransformationError,generate_de 
-   cimal_mersenne_and_upload.ps1
-  
-    
-    New-AzureBatchTask -JobId $jobname -BatchContext $batchkeys -CommandLine $taskCMD -Id $taskname -Constraints $constraints -ApplicationPackageReferences $appref
+    New-AzureBatchTask -JobId $jobname -BatchContext $batchkeys -CommandLine $taskCMD -Id $taskname -Constraints $constraints -ApplicationPackageReferences $appref -Verbose:$false
 }
 
 #
