@@ -1,4 +1,20 @@
-﻿# Requirements: existing batch account, one active pool with Windows machines, app registered on the batch account 
+﻿<#
+.Synopsis
+  Create an Azure Batch job and tasks to run package Mersenne
+.DESCRIPTION
+  Source and documentation are here: https://github.com/wkasdorp/Azure-Batch
+  Must have a pre-existing Azure Batch, configured with exactly one
+  active Pool having the package called Mersenne. 
+  You must be currently logged on to Azure using Add-AzureRMAccount or the equivalent.  
+.EXAMPLE
+  .\Create-BatchJobsAndTasks.ps1
+.NOTES
+    Version:        1.0 : first version. 
+    Author:         Willem Kasdorp, Microsoft. 
+    Creation Date:  12/30/2017
+    Last modified:  12/30/2017
+#>
+
 $VerbosePreference="Continue"
 
 #
@@ -94,7 +110,7 @@ $firstindex..$lastindex  | ForEach-Object {
 #
 # wait for tasks to finish while supplying some output. 
 #
-Write-Verbose "Now waiting for tasks to complete"                  
+Write-Verbose "Now waiting for tasks to complete."                  
 Write-Host "Waiting for tasks to complete..." -ForegroundColor Cyan
 Write-Host " Active    : waiting to be provisioned. This is expected when nodes are busy or not ready." -ForegroundColor Cyan
 Write-Host " Running   : job is active on a node." -ForegroundColor Cyan

@@ -1,4 +1,26 @@
-﻿# This walkthrough was adapted from: https://docs.microsoft.com/en-us/azure/batch/batch-powershell-cmdlets-get-started 
+﻿<#
+.Synopsis
+  Create an Azure Batch account, Storage Account, Package, and Pool
+.DESCRIPTION
+  This walkthrough was started from: https://docs.microsoft.com/en-us/azure/batch/batch-powershell-cmdlets-get-started 
+  Source and documentation are here: https://github.com/wkasdorp/Azure-Batch
+  You must have an active Azure Subscription with the permissions to create required resources.
+  The goal of this script is to illustrate a working Azure Batch example. The workload is to create
+  the decimal representation of known Mersenne primes. See the readme.md on Github for more details. 
+  This script will create:
+  - Resource Group
+  - Azure Batch Account
+  - Download ZIP with scripts to run Mersenne primes
+  - Create package definition for the Mersenn primes
+  - Create a pool of VMs ready to run jobs and tasks. 
+.EXAMPLE
+  .\Create-BatchAccountMersenne.ps1
+.NOTES
+    Version:        1.0 : first version. 
+    Author:         Willem Kasdorp, Microsoft. 
+    Creation Date:  12/30/2017
+    Last modified:  12/30/2017
+#>
 
 #
 # preliminary stuff: log on to azure, enable verbosity to see what is happening. Edit as you see fit. 
@@ -117,3 +139,17 @@ $PoolConfig = New-Object -TypeName "Microsoft.Azure.Commands.Batch.Models.PSClou
 New-AzureBatchPool -Id $PoolName -VirtualMachineSize "Small" -CloudServiceConfiguration $PoolConfig `
     -BatchContext $BatchContext -ApplicationPackageReferences $appPackageReference -TargetDedicatedComputeNodes $Nodecount
 
+@"
+Created the following.
+- Resource Group Name : $ResourceGroupName
+- Storage account name: $StorageAccountName
+- Azure Batch account : $BatchAccountName
+- Package name        : $Applicationname
+- VM Pool name        : $PoolName
+- VM Pool OS          : $WindowsVersion
+
+Wait up to 15 minutes for the VMs to be fully provisioned. You can submit jobs,
+but they won't run until VM provisioning is done.
+
+Next step: run .\Create-BatchJobsAndTasks.ps1
+"@ | Write-Host -ForegroundColor Yellow
