@@ -7,7 +7,7 @@ For this example I went back to my teenage years when I was fascinated by prime 
 
 This prime number is a so-called [Mersenne Prime](https://www.mersenne.org/). Numbers of the form M=2<sup>p</sup>-1, where *p* is a prime number, have special properties making it relatively easy to tell if the number M is prime. The largest currently known prime is 2<sup>274,207,281</sup>-1, and this is indeed a Mersenne prime. 
 
-Why am I explaining this bit of trivia? Because the exercise of translating a Mersenne number to decimals requires quite a bit of calculation, especially if you want the exact number. For instance, 2<sup>107</sup>-1 = 162259276829213363391578010288127 (33 digits), the largest known prime has a whopping 22,338,618 digits...  
+Why am I explaining this bit of trivia? Because the exercise of translating a Mersenne number to decimals requires quite a bit of calculation, especially if you want the exact number. For instance, 2<sup>107</sup>-1 = 162259276829213363391578010288127 (33 digits), while the largest known prime has a whopping 22,338,618 digits...  
 
 So let's say that I want to generate the decimal representation of all known Mersenne Primes. I can do this one at the time, but can also use multiple VMs simultaneously and use Azure Batch to coordinate it. Globally, this is the outline of a script to do this:
 1. create an Azure Batch account, with an associated Azure Storage Account to store the packages and the results of the calculations. 
@@ -16,7 +16,7 @@ So let's say that I want to generate the decimal representation of all known Mer
 4. Start one job with a task for each of the individual Mersenne Primes, and submit this to the pool.
 5. Retrieve the results. 
 
-The essential bit of PowerShell code that does the actual work is surprisingly short. It turns out the the standard .NET framework already has the necessary modules. 
+The essential bit of PowerShell code that does the actual work is surprisingly short. It turns out that the standard .NET framework already has the necessary modules. 
 ```powershell
 function PrintMersenneDecimal ([int] $n, $width = 80)
 {
@@ -29,7 +29,7 @@ function PrintMersenneDecimal ([int] $n, $width = 80)
     }    
 }
 ```
-There is just one line for the calculation `[numerics.biginteger]::pow(2,$n)-1`. The rest is converting the result into human readable form. 
+There is just one line for the actual calculation: `[numerics.biginteger]::pow(2,$n)-1`. The rest is converting the result into human readable form. 
 
 The walkthrough has the following files.
 * *Create-BatchAccountMersenne.ps1*: Create an Azure Batch account, corresponding storage account, Mersenne package, and a pool of VMs to run the code.
