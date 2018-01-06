@@ -6,6 +6,7 @@ Param
     [int] $index
 )
 
+# up to date as of 1-3-2018.
 $MersenneExponents = @(
     2, 3, 5, 7, 13,
     17, 19, 31, 61, 89,
@@ -16,7 +17,7 @@ $MersenneExponents = @(
     216091, 756839, 859433, 1257787, 1398269,
     2976221, 3021377, 6972593, 13466917, 20996011,
     24036583, 25964951, 30402457, 32582657, 37156667,
-    42643801, 43112609, 57885161, 74207281
+    42643801, 43112609, 57885161, 74207281, 77232917
 )
 if ($index -ge $MersenneExponents.Count) {
     throw { "Maximum index for Mersenne exponent array exceeded." }
@@ -33,7 +34,7 @@ function PrintMersenneDecimal ([int] $n, $width = 80)
     }    
 }
 
-# you can easily change this to a range :)
+# you can easily change this to a range of numbers. 
 $MersenneExponents[$index] | ForEach-Object {
     $stopWatch = New-Object -TypeName System.Diagnostics.Stopwatch
     $stopWatch.Start()

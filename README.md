@@ -20,9 +20,12 @@ My goal here is to set up an example that means something to the IT Pro who, lik
 
 For this example I went back to my teenage years when I was fascinated by prime number calculations, and abused my Commodore 64 with assembly code for all sorts of simple calculations. One of the earliest things I tried was to calculate the decimal representation of the largest prime number known at the time, which was 2<sup>216,091</sup>-1. This number has 65,050 digits, which makes it challenging to calculate. I had quite a bit of trouble fitting this in my 64KB Commodore 64. 
 
-This prime number is a so-called [Mersenne Prime](https://www.mersenne.org/). Numbers of the form M=2<sup>p</sup>-1, where *p* is a prime number, have special properties making it relatively easy to tell if the number M is prime. The largest currently known prime is 2<sup>274,207,281</sup>-1, and this is indeed a Mersenne prime. 
+This prime number is a so-called [Mersenne Prime](https://www.mersenne.org/). Numbers of the form M=2<sup>p</sup>-1, where *p* is a prime number, have special properties making it relatively easy to tell if the number M is prime. The largest currently known prime is 2<sup>74,207,281</sup>-1, and this is indeed a Mersenne prime. 
 
-Why am I explaining this bit of trivia? Because the exercise of translating a Mersenne number to decimals requires quite a bit of calculation, especially if you want the exact number. For instance, 2<sup>107</sup>-1 = 162259276829213363391578010288127 (33 digits), while the largest known prime has a whopping 22,338,618 digits...  
+> ### @icon-exclamation-circle New largest prime discovered!
+> While I was writing this documentation, a new [Mersenne prime was discovered](https://www.mersenne.org/primes/press/M77232917.html). This prime, expressed as 2<sup>77,232,917</sup>-1, is currently (1-3-2018) the largest known prime number.
+
+Why am I explaining this bit of trivia? Because the exercise of translating a Mersenne number to decimals requires quite a bit of calculation, especially if you want the exact number. For instance, 2<sup>107</sup>-1 = 162259276829213363391578010288127 (33 digits), while the largest known prime number (1-3-2018) has a whopping 23,249,425 digits...  
 
 So let's say that I want to generate the decimal representation of all known Mersenne Primes. I can do this one at the time, but can also use multiple VMs simultaneously and use Azure Batch to coordinate it. Globally, this is the outline of a script to do this:
 1. create an Azure Batch account, with an associated Azure Storage Account to store the packages and the results of the calculations. 
