@@ -22,7 +22,7 @@ For this example I went back to my teenage years when I was fascinated by prime 
 
 This prime number is a so-called [Mersenne Prime](https://www.mersenne.org/). Numbers of the form M=2<sup>p</sup>-1, where *p* is a prime number, have special properties making it relatively easy to tell if the number M is prime. The largest currently known prime is 2<sup>74,207,281</sup>-1, and this is indeed a Mersenne prime. 
 
-> ### @icon-exclamation-circle New largest prime discovered!
+> ### ! New largest prime discovered!
 > While I was writing this documentation, a new [Mersenne prime was discovered](https://www.mersenne.org/primes/press/M77232917.html). This prime, expressed as 2<sup>77,232,917</sup>-1, is currently (1-3-2018) the largest known prime number.
 
 Why am I explaining this bit of trivia? Because the exercise of translating a Mersenne number to decimals requires quite a bit of calculation, especially if you want the exact number. For instance, 2<sup>107</sup>-1 = 162259276829213363391578010288127 (33 digits), while the largest known prime number (1-3-2018) has a whopping 23,249,425 digits...  
